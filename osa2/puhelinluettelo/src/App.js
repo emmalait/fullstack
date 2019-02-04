@@ -1,30 +1,35 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import axios from 'axios';
 import Filter from "./components/Filter";
 import PersonForm from "./components/PersonForm";
 import Persons from "./components/Persons";
 
 const App = () => {
-  const [persons, setPersons] = useState([
-    { id: "Arto Hellas", name: "Arto Hellas", number: "040-123456" },
-    { id: "Martti Tienari", name: "Martti Tienari", number: "040-123456" },
-    { id: "Arto Järvinen", name: "Arto Järvinen", number: "040-123456" },
-    { id: "Lea Kutvonen", name: "Lea Kutvonen", number: "040-123456" }
-  ]);
+  const [persons, setPersons] = useState([]);
   const [newName, setNewName] = useState("");
   const [newNumber, setNewNumber] = useState("");
   const [newSearch, setNewSearch] = useState("");
   const [personsToShow, setPersonsToShow] = useState(persons);
 
+  useEffect(() => {
+    axios
+      .get('http://localhost:3001/persons')
+      .then(response => {
+        setPersons(response.data)
+        setPersonsToShow(response.data)
+      })
+  }, [])
+ 
   const addPerson = event => {
     event.preventDefault();
 
     var findExisting = persons.filter(function(f) {
-      return f.id === newName;
+      return f.name === newName;
     });
 
     if (findExisting.length < 1) {
       const personObject = {
-        id: newName,
+        id: persons.length + 1,
         name: newName,
         number: newNumber
       };
