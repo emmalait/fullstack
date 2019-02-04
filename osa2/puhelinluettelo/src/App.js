@@ -1,22 +1,22 @@
 import React, { useState, useEffect } from "react";
-import axios from 'axios';
 import Filter from "./components/Filter";
 import PersonForm from "./components/PersonForm";
 import Persons from "./components/Persons";
+import personService from "./services/persons";
 
 const App = () => {
   const [persons, setPersons] = useState([]);
   const [newName, setNewName] = useState("");
   const [newNumber, setNewNumber] = useState("");
   const [newSearch, setNewSearch] = useState("");
-  const [personsToShow, setPersonsToShow] = useState(persons);
+  const [personsToShow, setPersonsToShow] = useState([]);
 
   useEffect(() => {
-    axios
-      .get('http://localhost:3001/persons')
-      .then(response => {
-        setPersons(response.data)
-        setPersonsToShow(response.data)
+    personService
+      .getAll()
+      .then(initialPersons => {
+        setPersons(initialPersons)
+        setPersonsToShow(initialPersons)
       })
   }, [])
  
@@ -29,18 +29,23 @@ const App = () => {
 
     if (findExisting.length < 1) {
       const personObject = {
-        id: persons.length + 1,
         name: newName,
         number: newNumber
       };
-      setPersons(persons.concat(personObject));
+      
+      personService
+        .create(personObject)
+        .then(returnedPerson => {
+          setPersons(persons.concat(returnedPerson));
+          setPersonsToShow(personsToShow.concat(returnedPerson));
+          setNewName('');
+          setNewNumber('');
+          
+        })
     } else {
       window.alert(`${newName} on jo luettelossa!`);
     }
 
-    setNewName("");
-    setNewNumber("");
-    setPersonsToShow(persons);
   };
 
   const handleNameChange = event => {
