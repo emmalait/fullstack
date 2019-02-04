@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import Filter from "./components/Filter";
 import PersonForm from "./components/PersonForm";
 import Persons from "./components/Persons";
+import Notification from "./components/Notification";
 import personService from "./services/persons";
 
 const App = () => {
@@ -10,16 +11,15 @@ const App = () => {
   const [newNumber, setNewNumber] = useState("");
   const [newSearch, setNewSearch] = useState("");
   const [personsToShow, setPersonsToShow] = useState([]);
+  const [errorMessage, setErrorMessage] = useState(null);
 
   useEffect(() => {
-    personService
-      .getAll()
-      .then(initialPersons => {
-        setPersons(initialPersons)
-        setPersonsToShow(initialPersons)
-      })
-  }, [])
- 
+    personService.getAll().then(initialPersons => {
+      setPersons(initialPersons);
+      setPersonsToShow(initialPersons);
+    });
+  }, []);
+
   const addPerson = event => {
     event.preventDefault();
 
@@ -32,20 +32,23 @@ const App = () => {
         name: newName,
         number: newNumber
       };
-      
-      personService
-        .create(personObject)
-        .then(returnedPerson => {
-          setPersons(persons.concat(returnedPerson));
-          setPersonsToShow(personsToShow.concat(returnedPerson));
-          setNewName('');
-          setNewNumber('');
-          
-        })
+
+      personService.create(personObject).then(returnedPerson => {
+        setPersons(persons.concat(returnedPerson));
+        setPersonsToShow(personsToShow.concat(returnedPerson));
+        setNewName("");
+        setNewNumber("");
+
+        setErrorMessage(
+          `Henkilö '${newName}' lisättiin palvelimelle`
+        )
+        setTimeout(() => {
+          setErrorMessage(null)
+        }, 5000)
+      });
     } else {
       window.alert(`${newName} on jo luettelossa!`);
     }
-
   };
 
   const handleNameChange = event => {
@@ -58,7 +61,7 @@ const App = () => {
 
   const handlePersonsToShowChange = event => {
     setNewSearch(event.target.value);
-    
+
     const findSearched = persons.filter(function(f) {
       return f.name.toLowerCase().includes(event.target.value.toLowerCase());
     });
@@ -70,16 +73,29 @@ const App = () => {
     <div>
       <h2>Puhelinluettelo</h2>
 
-      <Filter newSearch={newSearch} handlePersonsToShowChange={handlePersonsToShowChange}/>
+      <Notification message={errorMessage} />
+
+      <Filter
+        newSearch={newSearch}
+        handlePersonsToShowChange={handlePersonsToShowChange}
+      />
 
       <h3>Lisää uusi</h3>
 
-      <PersonForm addPerson={addPerson} newName={newName} handleNameChange={handleNameChange} newNumber={newNumber} handleNumberChange={handleNumberChange} /> 
-      
+      <PersonForm
+        addPerson={addPerson}
+        newName={newName}
+        handleNameChange={handleNameChange}
+        newNumber={newNumber}
+        handleNumberChange={handleNumberChange}
+      />
+
       <h2>Numerot</h2>
 
-      <Persons personsToShow={personsToShow} />
-
+      <Persons
+        personsToShow={personsToShow}
+        setErrorMessage={setErrorMessage}
+        />
     </div>
   );
 };
