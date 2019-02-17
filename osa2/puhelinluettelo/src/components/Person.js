@@ -1,5 +1,4 @@
 import React from 'react'
-import Notification from "./Notification"
 import personService from "../services/persons"
 
 const Person = ({id, name, number, setErrorMessage}) => {
