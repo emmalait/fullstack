@@ -11,16 +11,13 @@ import loginService from './services/login'
 const App = () => {
   const [blogs, setBlogs] = useState([])
   const [notification, setNotification] = useState(null)
-  //const [newTitle, setNewTitle] = useState('')
-  //const [newAuthor, setNewAuthor] = useState('')
-  //const [newUrl, setNewUrl] = useState('')
   const newTitle = useField('text')
   const newAuthor = useField('text')
   const newUrl = useField('text')
   const username = useField('text')
   const password = useField('text')
   const [user, setUser] = useState(null)
-  //const [updatedBlog, setUpdatedBlog] = useState(null)
+  const [updatedBlog, setUpdatedBlog] = useState(null)
 
   const blogFormRef = React.createRef()
 
@@ -52,7 +49,8 @@ const App = () => {
       setBlogs(blogs.concat(returnedBlog))
 
       setNotification({
-        message: 'a new blog ' + newTitle.value + ' by ' + newAuthor.value + ' added!',
+        message:
+          'a new blog ' + newTitle.value + ' by ' + newAuthor.value + ' added!',
         type: 'success'
       })
       setTimeout(() => {
@@ -65,14 +63,25 @@ const App = () => {
     })
   }
 
-  /*const updateBlog = event => {
+  const updateBlog = event => {
     event.preventDefault()
 
-    blogService.update(updatedBlog).then(returnedBlog => {
-      setBlogs(blogs.map(blog => updatedBlog.id !== id ? blog : returnedBlog))
-    })
-  }*/
+    console.log(updatedBlog)
 
+    const blogObject = {
+      id: updatedBlog.id,
+      title: updatedBlog.title,
+      author: updatedBlog.author,
+      url: updatedBlog.url,
+      likes: updatedBlog.likes + 1
+    }
+
+    blogService.update(blogObject).then(returnedBlog => {
+      setBlogs(
+        blogs.map(blog => (blog.id !== updatedBlog.id ? blog : returnedBlog))
+      )
+    })
+  }
 
   const handleLogin = async event => {
     event.preventDefault()
@@ -147,7 +156,12 @@ const App = () => {
           {blogForm()}
 
           {blogs.map(blog => (
-            <Blog key={blog.id} blog={blog} />
+            <Blog
+              key={blog.id}
+              blog={blog}
+              updateBlog={updateBlog}
+              setUpdatedBlog={setUpdatedBlog}
+            />
           ))}
         </div>
       )}
