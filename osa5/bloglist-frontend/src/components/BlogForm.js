@@ -2,11 +2,8 @@ import React from 'react'
 
 const BlogForm = ({
   onSubmit,
-  handleTitleChange,
   newTitle,
-  handleAuthorChange,
   newAuthor,
-  handleUrlChange,
   newUrl
 }) => {
   return (
@@ -16,15 +13,27 @@ const BlogForm = ({
       <form onSubmit={onSubmit}>
         <div>
           Title
-          <input value={newTitle} onChange={handleTitleChange} />
+          <input
+            type={newTitle.type}
+            value={newTitle.value}
+            onChange={newTitle.onChange}
+          />
         </div>
         <div>
           Author
-          <input value={newAuthor} onChange={handleAuthorChange} />
+          <input
+            type={newAuthor.type}
+            value={newAuthor.value}
+            onChange={newAuthor.onChange}
+          />
         </div>
         <div>
           Url
-          <input value={newUrl} onChange={handleUrlChange} />
+          <input
+            type={newUrl.type}
+            value={newUrl.value}
+            onChange={newUrl.onChange}
+          />
         </div>
         <button type="submit">save</button>
       </form>

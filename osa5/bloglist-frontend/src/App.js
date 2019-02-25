@@ -11,9 +11,12 @@ import loginService from './services/login'
 const App = () => {
   const [blogs, setBlogs] = useState([])
   const [notification, setNotification] = useState(null)
-  const [newTitle, setNewTitle] = useState('')
-  const [newAuthor, setNewAuthor] = useState('')
-  const [newUrl, setNewUrl] = useState('')
+  //const [newTitle, setNewTitle] = useState('')
+  //const [newAuthor, setNewAuthor] = useState('')
+  //const [newUrl, setNewUrl] = useState('')
+  const newTitle = useField('text')
+  const newAuthor = useField('text')
+  const newUrl = useField('text')
   const username = useField('text')
   const password = useField('text')
   const [user, setUser] = useState(null)
@@ -39,9 +42,9 @@ const App = () => {
     blogFormRef.current.toggleVisibility()
 
     const blogObject = {
-      title: newTitle,
-      author: newAuthor,
-      url: newUrl,
+      title: newTitle.value,
+      author: newAuthor.value,
+      url: newUrl.value,
       likes: 0
     }
 
@@ -49,16 +52,16 @@ const App = () => {
       setBlogs(blogs.concat(returnedBlog))
 
       setNotification({
-        message: 'a new blog ' + newTitle + ' by ' + newAuthor + ' added!',
+        message: 'a new blog ' + newTitle.value + ' by ' + newAuthor.value + ' added!',
         type: 'success'
       })
       setTimeout(() => {
         setNotification(null)
       }, 5000)
 
-      setNewTitle('')
-      setNewAuthor('')
-      setNewUrl('')
+      newTitle.reset()
+      newAuthor.reset()
+      newUrl.reset()
     })
   }
 
@@ -70,17 +73,6 @@ const App = () => {
     })
   }*/
 
-  const handleTitleChange = event => {
-    setNewTitle(event.target.value)
-  }
-
-  const handleAuthorChange = event => {
-    setNewAuthor(event.target.value)
-  }
-
-  const handleUrlChange = event => {
-    setNewUrl(event.target.value)
-  }
 
   const handleLogin = async event => {
     event.preventDefault()
@@ -132,11 +124,8 @@ const App = () => {
       <BlogForm
         onSubmit={addBlog}
         newTitle={newTitle}
-        handleTitleChange={handleTitleChange}
         newAuthor={newAuthor}
-        handleAuthorChange={handleAuthorChange}
         newUrl={newUrl}
-        handleUrlChange={handleUrlChange}
       />
     </Togglable>
   )
