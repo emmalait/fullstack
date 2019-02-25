@@ -1,6 +1,14 @@
 import React from 'react'
 
-const BlogForm = ({ onSubmit, handleTitleChange, newTitle, handleAuthorChange, newAuthor, handleUrlChange, newUrl }) => {
+const BlogForm = ({
+  onSubmit,
+  handleTitleChange,
+  newTitle,
+  handleAuthorChange,
+  newAuthor,
+  handleUrlChange,
+  newUrl
+}) => {
   return (
     <div>
       <h2>create new blog</h2>
@@ -21,7 +29,7 @@ const BlogForm = ({ onSubmit, handleTitleChange, newTitle, handleAuthorChange, n
         <button type="submit">save</button>
       </form>
     </div>
-  );
-};
+  )
+}
 
 export default BlogForm

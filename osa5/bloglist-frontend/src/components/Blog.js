@@ -3,7 +3,7 @@ import React, { useState } from 'react'
 const Blog = ({ blog }) => {
   const [visible, setVisible] = useState(false)
 
-  const hideWhenVisible = { display: visible ? 'none' : '' }
+  //const hideWhenVisible = { display: visible ? 'none' : '' }
   const showWhenVisible = { display: visible ? '' : 'none' }
 
   const toggleVisibility = () => {
@@ -26,7 +26,7 @@ const Blog = ({ blog }) => {
 
   return (
     <div style={blogStyle}>
-      <div onClick={toggleVisibility}>
+      <div onClick={toggleVisibility} className='blog'>
         {blog.title} {blog.author}
         <div style={showWhenVisible}>
           <p>

@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react'
+import { useField } from './hooks'
 import Blog from './components/Blog'
 import Notification from './components/Notification'
 import Togglable from './components/Togglable'
@@ -13,16 +14,15 @@ const App = () => {
   const [newTitle, setNewTitle] = useState('')
   const [newAuthor, setNewAuthor] = useState('')
   const [newUrl, setNewUrl] = useState('')
-  const [username, setUsername] = useState('')
-  const [password, setPassword] = useState('')
+  const username = useField('text')
+  const password = useField('text')
   const [user, setUser] = useState(null)
   //const [updatedBlog, setUpdatedBlog] = useState(null)
 
   const blogFormRef = React.createRef()
 
   useEffect(() => {
-    blogService.getAll()
-    .then(blogs => setBlogs(blogs))
+    blogService.getAll().then(blogs => setBlogs(blogs))
   }, [])
 
   useEffect(() => {
@@ -30,7 +30,7 @@ const App = () => {
     if (loggedUserJSON) {
       const user = JSON.parse(loggedUserJSON)
       setUser(user)
-      blogService.setToken(user.token)
+      //blogService.setToken(user.token)
     }
   }, [])
 
@@ -85,18 +85,19 @@ const App = () => {
   const handleLogin = async event => {
     event.preventDefault()
     try {
-      const user = await loginService.login({
-        username,
-        password
-      })
+      const un = username.value
+      const pw = password.value
 
-      window.localStorage.setItem('loggedBloglistUser', JSON.stringify(user))
+      const user = await loginService.login({
+        username: un,
+        password: pw
+      })
 
       window.localStorage.setItem('loggedBloglistUser', JSON.stringify(user))
       blogService.setToken(user.token)
       setUser(user)
-      setUsername('')
-      setPassword('')
+      username.reset()
+      password.reset()
     } catch (exception) {
       setNotification({ message: 'wrong username or password', type: 'error' })
       setTimeout(() => {
@@ -119,8 +120,6 @@ const App = () => {
           <LoginForm
             username={username}
             password={password}
-            handleUsernameChange={({ target }) => setUsername(target.value)}
-            handlePasswordChange={({ target }) => setPassword(target.value)}
             handleSubmit={handleLogin}
           />
         </Togglable>
@@ -156,13 +155,11 @@ const App = () => {
 
           <button onClick={handleLogout}>logout</button>
 
-          {blogForm()}           
-            
+          {blogForm()}
+
           {blogs.map(blog => (
             <Blog key={blog.id} blog={blog} />
           ))}
-
-
         </div>
       )}
     </div>
