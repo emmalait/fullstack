@@ -1,12 +1,21 @@
 import React from "react";
-import { createVote } from "../reducers/anecdoteReducer";
+import { createVote } from '../reducers/anecdoteReducer'
+import { createNotification, resetNotification } from '../reducers/notificationReducer'
 
 const AnecdoteList = props => {
-  const anecdotes = props.store.getState();
+  const anecdotes = props.store.getState().anecdotes;
 
   const vote = id => {
     console.log("vote", id);
-    props.store.dispatch(createVote(id));
+    props.store.dispatch(createVote(id))
+    props.store.dispatch(createNotification("You voted " + anecdotes.find(anecdote => {
+      return anecdote.id === id
+    }).content))
+    setTimeout(() => {
+      props.store.dispatch(
+        resetNotification()
+      )
+    }, 5000)
   };
 
   return (
