@@ -1,33 +1,16 @@
-import React from 'react';
+import React from "react";
+import AnecdoteForm from './components/AnecdoteForm'
+import AnecdoteList from "./components/AnecdoteList";
 
-const App = (props) => {
-  const anecdotes = props.store.getState()
-  
-  const vote = (id) => {
-    console.log('vote', id)
-  }
-  
+const App = props => {
+  const store = props.store
+
   return (
     <div>
-      <h2>Anecdotes</h2>
-      {anecdotes.map(anecdote =>
-        <div key={anecdote.id}>
-          <div>
-            {anecdote.content}
-          </div>
-          <div>
-            has {anecdote.votes}
-            <button onClick={() => vote(anecdote.id)}>vote</button>
-          </div>
-        </div>
-      )}
-      <h2>create new</h2>
-      <form>
-        <div><input /></div>
-        <button>create</button>
-      </form>
+      <AnecdoteList store={store}/>
+      <AnecdoteForm store={store}/>
     </div>
-  )
-}
+  );
+};
 
-export default App
+export default App;
