@@ -13,8 +13,12 @@ const createNew = async content => {
   return response.data
 }
 
+const update = (id, newObject) => {
+  return axios.put(`${url}/${id}`, newObject)
+}
 
 export default { 
   getAll,
-  createNew
+  createNew,
+  update
 }
