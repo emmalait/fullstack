@@ -1,0 +1,9 @@
+POST http://localhost:3003/api/blogs
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImhlbGxhcyIsImlkIjoiNWM2YWU0OTE2ZDliZmFiZWEyMjljZWZhIiwiaWF0IjoxNTUwNTA5NzA0fQ.Pspsj2MxzxTi46Q8U9bdyvFQtNLCHDheQkngAVRRN8w
+
+{
+    "title": "Testit kannattaa aina",
+    "author": "Terttu Testaaja",
+    "url": "http://testaa.com"
+}
