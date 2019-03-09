@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react'
+import { connect } from 'react-redux'
 import { useField } from './hooks'
 import Blog from './components/Blog'
 import Notification from './components/Notification'
@@ -8,23 +9,20 @@ import BlogForm from './components/BlogForm'
 import blogService from './services/blogs'
 import loginService from './services/login'
 import { setNotification } from './reducers/notificationReducer'
+import { initializeBlogs, createBlog, addLike } from './reducers/blogReducer'
 
 const App = (props) => {
-  const [blogs, setBlogs] = useState([])
   const newTitle = useField('text')
   const newAuthor = useField('text')
   const newUrl = useField('text')
   const username = useField('text')
   const password = useField('text')
   const [user, setUser] = useState(null)
-  const [updatedBlog, setUpdatedBlog] = useState(null)
 
   const blogFormRef = React.createRef()
 
-  const store = props.store
-
   useEffect(() => {
-    blogService.getAll().then(blogs => setBlogs(blogs))
+    props.initializeBlogs()
   }, [])
 
   useEffect(() => {
@@ -32,7 +30,7 @@ const App = (props) => {
     if (loggedUserJSON) {
       const user = JSON.parse(loggedUserJSON)
       setUser(user)
-      //blogService.setToken(user.token)
+      blogService.setToken(user.token)
     }
   }, [])
 
@@ -47,31 +45,26 @@ const App = (props) => {
       likes: 0
     }
 
-    blogService.create(blogObject).then(returnedBlog => {
-      setBlogs(blogs.concat(returnedBlog))
-      notify('a new blog ' + newTitle.value + ' by ' + newAuthor.value + ' added!')
+    props.createBlog(blogObject)
 
-      newTitle.reset()
-      newAuthor.reset()
-      newUrl.reset()
-    })
+    notify('a new blog ' + newTitle.value + ' by ' + newAuthor.value + ' added!')
+
+    newTitle.reset()
+    newAuthor.reset()
+    newUrl.reset()
   }
 
   const notify = (message, notifType = 'success') => {
-    store.dispatch(
-      setNotification(
-        message,
-        notifType,
-        10
-      )
+    props.setNotification(
+      message,
+      notifType,
+      10
     )
   }
 
   const likeBlog = async (blog) => {
-    const likedBlog = { ...blog, likes: blog.likes + 1 }
-    const updatedBlog = await blogService.update(likedBlog)
-    setBlogs(blogs.map(b => b.id === blog.id ? updatedBlog : b))
-    notify(`blog ${updatedBlog.title} by ${updatedBlog.author} liked!`)
+    props.addLike(blog.id)
+    notify(`blog ${blog.title} by ${blog.author} liked!`)
   }
 
   const handleLogin = async event => {
@@ -91,10 +84,7 @@ const App = (props) => {
       username.reset()
       password.reset()
     } catch (exception) {
-      setNotification({ message: 'wrong username or password', type: 'error' })
-      setTimeout(() => {
-        setNotification(null)
-      }, 5000)
+      notify({ message: 'wrong username or password', type: 'error' })
     }
   }
 
@@ -134,7 +124,7 @@ const App = (props) => {
     <div>
       <h1>bloglist</h1>
 
-      <Notification message={store.getState()} />
+      <Notification message={props.notification} />
 
       {user === null ? (
         loginForm()
@@ -146,12 +136,11 @@ const App = (props) => {
 
           {blogForm()}
 
-          {blogs.map(blog => (
+          {props.blogs.map(blog => (
             <Blog
               key={blog.id}
               blog={blog}
               likeBlog={likeBlog}
-              setUpdatedBlog={setUpdatedBlog}
             />
           ))}
         </div>
@@ -160,4 +149,23 @@ const App = (props) => {
   )
 }
 
-export default App
+const mapStateToProps = (state) => {
+  return {
+    notification: state.notification,
+    blogs: state.blogs
+  }
+}
+
+const mapDispatchToProps = {
+  initializeBlogs,
+  createBlog,
+  addLike,
+  setNotification
+}
+
+const ConnectedApp = connect(
+  mapStateToProps,
+  mapDispatchToProps
+)(App)
+
+export default ConnectedApp
