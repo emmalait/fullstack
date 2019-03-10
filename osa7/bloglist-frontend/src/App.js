@@ -1,88 +1,110 @@
-import React, { useEffect } from 'react'
-import { connect } from 'react-redux'
-import { useField } from './hooks'
-import Blog from './components/Blog'
-import Notification from './components/Notification'
-import Togglable from './components/Togglable'
-import LoginForm from './components/LoginForm'
-import BlogForm from './components/BlogForm'
-import loginService from './services/login'
-import { setNotification } from './reducers/notificationReducer'
-import { initializeBlogs, createBlog, addLike } from './reducers/blogReducer'
-import { setCurrentUser, login, logout } from './reducers/currentUserReducer'
+import React, { useEffect, useState } from "react";
+import { connect } from "react-redux";
+import { useField } from "./hooks";
+import Blog from "./components/Blog";
+import Notification from "./components/Notification";
+import Togglable from "./components/Togglable";
+import LoginForm from "./components/LoginForm";
+import BlogForm from "./components/BlogForm";
+import loginService from "./services/login";
+import userService from './services/users'
+import { setNotification } from "./reducers/notificationReducer";
+import { initializeBlogs, createBlog, addLike } from "./reducers/blogReducer";
+import { setCurrentUser, login, logout } from "./reducers/currentUserReducer";
+import {
+  BrowserRouter as Router,
+  Route,
+  Link,
+  Redirect,
+  withRouter
+} from "react-router-dom";
 
-const App = (props) => {
-  const newTitle = useField('text')
-  const newAuthor = useField('text')
-  const newUrl = useField('text')
-  const username = useField('text')
-  const password = useField('text')
-  const blogFormRef = React.createRef()
+const Menu = (props) => {
+  const padding = {
+    paddingRight: 5
+  }
 
-  useEffect(() => {
-    props.initializeBlogs()
-  }, [])
+  return (
+    <Router>
+        <div>
+          <div>
+            <Link style={padding} to="/">
+              home
+            </Link>
+            <Link style={padding} to="/users">
+              users
+            </Link>
+          </div>
+          <Route exact path="/" render={() => 
+            <Home
+              notify={props.notify}
+              currentUser={props.currentUser}
+              notification={props.notification}
+              blogs={props.blogs}
+              createBlog={props.createBlog}
+              addLike={props.addLike}
+              login={props.login}
+            />
+          } />
+          <Route exact path="/users" render={() => <Users />} />
+        </div>
+      </Router>
+  )
+}
 
-  useEffect(() => {
-    props.setCurrentUser()
-  }, [])
+const Home = (props) => {
+  const newTitle = useField("text");
+  const newAuthor = useField("text");
+  const newUrl = useField("text");
+  const username = useField("text");
+  const password = useField("text");
+  const blogFormRef = React.createRef();
 
   const addBlog = event => {
-    event.preventDefault()
-    blogFormRef.current.toggleVisibility()
+    event.preventDefault();
+    blogFormRef.current.toggleVisibility();
 
     const blogObject = {
       title: newTitle.value,
       author: newAuthor.value,
       url: newUrl.value,
       likes: 0
-    }
+    };
 
-    props.createBlog(blogObject)
+    props.createBlog(blogObject);
 
-    notify('a new blog ' + newTitle.value + ' by ' + newAuthor.value + ' added!')
+    props.notify(
+      "a new blog " + newTitle.value + " by " + newAuthor.value + " added!"
+    );
 
-    newTitle.reset()
-    newAuthor.reset()
-    newUrl.reset()
-  }
+    newTitle.reset();
+    newAuthor.reset();
+    newUrl.reset();
+  };
 
-  const notify = (message, notifType = 'success') => {
-    props.setNotification(
-      message,
-      notifType,
-      10
-    )
-  }
-
-  const likeBlog = async (blog) => {
-    props.addLike(blog.id)
-    notify(`blog ${blog.title} by ${blog.author} liked!`)
-  }
+  const likeBlog = async blog => {
+    props.addLike(blog.id);
+    props.notify(`blog ${blog.title} by ${blog.author} liked!`);
+  };
 
   const handleLogin = async event => {
-    event.preventDefault()
+    event.preventDefault();
     try {
       const user = await loginService.login({
         username: username.value,
         password: password.value
-      })
+      });
 
-      username.reset()
-      password.reset()
+      username.reset();
+      password.reset();
 
-      props.login(user)
+      props.login(user);
     } catch (exception) {
-      username.reset()
-      password.reset()
-      notify('wrong username of password', 'error')
+      username.reset();
+      password.reset();
+      props.notify("wrong username of password", "error");
     }
-  }
-
-  const handleLogout = async event => {
-    event.preventDefault()
-    props.logout()
-  }
+  };
 
   const loginForm = () => {
     return (
@@ -95,8 +117,8 @@ const App = (props) => {
           />
         </Togglable>
       </div>
-    )
-  }
+    );
+  };
 
   const blogForm = () => (
     <Togglable buttonLabel="new blog" ref={blogFormRef}>
@@ -107,44 +129,119 @@ const App = (props) => {
         newUrl={newUrl}
       />
     </Togglable>
-  )
+  );
+
+  return (
+  <div>
+    <h1>bloglist</h1>
+
+    <Notification message={props.notification} />
+
+    {props.currentUser === null ? (
+      loginForm()
+    ) : (
+      <div>
+        <p>
+        {blogForm()}
+        </p>
+
+        {props.blogs.map(blog => (
+          <Blog
+            key={blog.id}
+            blog={blog}
+            likeBlog={likeBlog}
+          />
+        ))}
+      </div>
+    )}
+  </div>
+)}
+
+const Users = (props) => {
+  const [users, setUsers] = useState([])
+
+  useEffect(() => {
+    userService.getAll().then(users => {
+      setUsers(users)
+    })
+  }, [])
 
   return (
     <div>
-      <h1>bloglist</h1>
+      <h1>Users</h1>
 
-      <Notification message={props.notification} />
-
-      {props.currentUser === null ? (
-        loginForm()
-      ) : (
-        <div>
-          <p>{props.currentUser.name} logged in</p>
-
-          <button onClick={handleLogout}>logout</button>
-
-          {blogForm()}
-
-          {props.blogs.map(blog => (
-            <Blog
-              key={blog.id}
-              blog={blog}
-              likeBlog={likeBlog}
-            />
-          ))}
-        </div>
-      )}
+      <table>
+        <tr>
+          <th></th>
+          <th>blogs created</th>
+        </tr>
+        {users.map(user => (
+          <tr>
+            <td>{user.name}</td>
+            <td>{user.blogs.length}</td>
+          </tr>
+        ))}
+      </table>
+      
     </div>
   )
 }
 
-const mapStateToProps = (state) => {
+const App = (props) => {
+  useEffect(() => {
+    props.initializeBlogs();
+  }, []);
+
+  useEffect(() => {
+    props.setCurrentUser();
+  }, []);
+
+  const notify = (message, notifType = "success") => {
+    props.setNotification(message, notifType, 10);
+  };
+
+  const handleLogout = async event => {
+    event.preventDefault();
+    props.logout();
+  };
+
+  const padding = { padding: 5 };
+
+  return (
+    <div class="container">
+      <h1>blogs</h1>
+
+      {props.currentUser === null ? (
+        ''
+      ) : (
+        <div>
+          <p>{props.currentUser.name} logged in</p>
+          <button onClick={handleLogout}>logout</button>
+        </div>
+      )}
+      
+      <Menu 
+        notify={notify}
+        currentUser={props.currentUser}
+        notification={props.notification}
+        blogs={props.blogs}
+        createBlog={props.createBlog}
+        addLike={props.addLike}
+        login={props.login}
+      />
+
+      
+    </div>
+  )
+}
+
+const mapStateToProps = state => {
   return {
     notification: state.notification,
     blogs: state.blogs,
     currentUser: state.currentUser
-  }
-}
+  };
+};
 
 const mapDispatchToProps = {
   initializeBlogs,
@@ -154,11 +251,11 @@ const mapDispatchToProps = {
   setCurrentUser,
   login,
   logout
-}
+};
 
 const ConnectedApp = connect(
   mapStateToProps,
   mapDispatchToProps
-)(App)
+)(App);
 
-export default ConnectedApp
+export default ConnectedApp;
