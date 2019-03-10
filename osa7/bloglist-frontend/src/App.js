@@ -6,6 +6,7 @@ import Notification from "./components/Notification";
 import Togglable from "./components/Togglable";
 import LoginForm from "./components/LoginForm";
 import BlogForm from "./components/BlogForm";
+import User from "./components/User"
 import loginService from "./services/login";
 import userService from './services/users'
 import { setNotification } from "./reducers/notificationReducer";
@@ -23,6 +24,8 @@ const Menu = (props) => {
   const padding = {
     paddingRight: 5
   }
+
+  console.log('userById: ', props.userById('5c73db6887f7ba03f469f0bd'))
 
   return (
     <Router>
@@ -46,7 +49,16 @@ const Menu = (props) => {
               login={props.login}
             />
           } />
-          <Route exact path="/users" render={() => <Users />} />
+          <Route exact path="/users" render={() =>
+            <Users 
+              users={props.users}
+              setUser={props.setUsers}
+              userById={props.userById}
+            />
+          } />
+          <Route exact path="/users/:id" render={({match}) =>
+            <User user={props.userById(match.params.id)} />
+          } />
         </div>
       </Router>
   )
@@ -158,13 +170,6 @@ const Home = (props) => {
 )}
 
 const Users = (props) => {
-  const [users, setUsers] = useState([])
-
-  useEffect(() => {
-    userService.getAll().then(users => {
-      setUsers(users)
-    })
-  }, [])
 
   return (
     <div>
@@ -175,9 +180,9 @@ const Users = (props) => {
           <th></th>
           <th>blogs created</th>
         </tr>
-        {users.map(user => (
+        {props.users.map(user => (
           <tr>
-            <td>{user.name}</td>
+            <td><Link to={`/users/${user.id}`}>{user.name}</Link></td>
             <td>{user.blogs.length}</td>
           </tr>
         ))}
@@ -188,6 +193,14 @@ const Users = (props) => {
 }
 
 const App = (props) => {
+  const [users, setUsers] = useState([])
+
+  useEffect(() => {
+    userService.getAll().then(users => {
+      setUsers(users)
+    })
+  }, [])
+
   useEffect(() => {
     props.initializeBlogs();
   }, []);
@@ -205,6 +218,10 @@ const App = (props) => {
     props.logout();
   };
 
+  const userById = (id) => {
+    return users.find(user => user.id === id)
+  }
+
   const padding = { padding: 5 };
 
   return (
@@ -219,7 +236,7 @@ const App = (props) => {
           <button onClick={handleLogout}>logout</button>
         </div>
       )}
-      
+
       <Menu 
         notify={notify}
         currentUser={props.currentUser}
@@ -228,6 +245,9 @@ const App = (props) => {
         createBlog={props.createBlog}
         addLike={props.addLike}
         login={props.login}
+        users={users}
+        setUser={setUsers}
+        userById={userById}
       />
 
       
