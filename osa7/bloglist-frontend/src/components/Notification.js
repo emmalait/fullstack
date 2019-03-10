@@ -1,4 +1,5 @@
 import React from 'react'
+import { Alert } from 'react-bootstrap'
 
 const Notification = (props) => {
   if (props.message === null) {
@@ -7,17 +8,9 @@ const Notification = (props) => {
 
   console.log(props)
 
-  const style = {
-    color: props.message.notifType === 'error' ? 'red' : 'green',
-    background: 'lightgrey',
-    fontSize: 20,
-    borderStyle: 'solid',
-    borderRadius: 5,
-    padding: 10,
-    marginBottom: 10
-  }
+  const variant = props.message.notifType === 'error' ? 'danger' : 'success'
 
-  return <div style={style}>{props.message.message}</div>
+  return <Alert variant={variant}>{props.message.message}</Alert>
 }
 
 export default Notification

@@ -19,6 +19,7 @@ import {
   Redirect,
   withRouter
 } from "react-router-dom";
+import { Table, Button } from 'react-bootstrap'
 
 const Menu = (props) => {
   const padding = {
@@ -154,17 +155,9 @@ const Home = (props) => {
     </Togglable>
   );
 
-  const blogStyle = {
-    paddingTop: 10,
-    paddingLeft: 2,
-    border: 'solid',
-    borderWidth: 1,
-    marginBottom: 5
-  }
-
   return (
   <div>
-    <h1>bloglist</h1>
+    <h1>blog app</h1>
 
     <Notification message={props.notification} />
 
@@ -176,12 +169,18 @@ const Home = (props) => {
         {blogForm()}
         </p>
 
-        {props.blogs.map(blog => (
-          <div style={blogStyle}>
-            <Link to={`/blogs/${blog.id}`}>{blog.title}</Link>
-          </div>
+        <Table striped>
+        <tbody>
           
+        {props.blogs.map(blog => (
+          <tr>
+            <td>
+            <Link to={`/blogs/${blog.id}`}>{blog.title}</Link>
+            </td>
+            </tr>
         ))}
+        </tbody>
+        </Table>
       </div>
     )}
   </div>
@@ -193,7 +192,7 @@ const Users = (props) => {
     <div>
       <h1>Users</h1>
 
-      <table>
+      <Table striped>
         <tr>
           <th></th>
           <th>blogs created</th>
@@ -204,7 +203,7 @@ const Users = (props) => {
             <td>{user.blogs.length}</td>
           </tr>
         ))}
-      </table>
+      </Table>
       
     </div>
   )
@@ -253,7 +252,7 @@ const App = (props) => {
       <Menu 
         notify={notify}
         currentUser={props.currentUser}
-        handleLogout={props.handleLogout}
+        handleLogout={handleLogout}
         notification={props.notification}
         blogs={props.blogs}
         createBlog={props.createBlog}
