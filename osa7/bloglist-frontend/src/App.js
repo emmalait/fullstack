@@ -25,8 +25,6 @@ const Menu = (props) => {
     paddingRight: 5
   }
 
-  console.log('userById: ', props.userById('5c73db6887f7ba03f469f0bd'))
-
   return (
     <Router>
         <div>
@@ -58,6 +56,9 @@ const Menu = (props) => {
           } />
           <Route exact path="/users/:id" render={({match}) =>
             <User user={props.userById(match.params.id)} />
+          } />
+          <Route exact path="/blogs/:id" render={({match}) =>
+            <Blog blog={props.blogById(match.params.id)} addLike={props.addLike} notify={props.notify}/>
           } />
         </div>
       </Router>
@@ -92,11 +93,6 @@ const Home = (props) => {
     newTitle.reset();
     newAuthor.reset();
     newUrl.reset();
-  };
-
-  const likeBlog = async blog => {
-    props.addLike(blog.id);
-    props.notify(`blog ${blog.title} by ${blog.author} liked!`);
   };
 
   const handleLogin = async event => {
@@ -143,6 +139,14 @@ const Home = (props) => {
     </Togglable>
   );
 
+  const blogStyle = {
+    paddingTop: 10,
+    paddingLeft: 2,
+    border: 'solid',
+    borderWidth: 1,
+    marginBottom: 5
+  }
+
   return (
   <div>
     <h1>bloglist</h1>
@@ -158,11 +162,10 @@ const Home = (props) => {
         </p>
 
         {props.blogs.map(blog => (
-          <Blog
-            key={blog.id}
-            blog={blog}
-            likeBlog={likeBlog}
-          />
+          <div style={blogStyle}>
+            <Link to={`/blogs/${blog.id}`}>{blog.title}</Link>
+          </div>
+          
         ))}
       </div>
     )}
@@ -222,6 +225,12 @@ const App = (props) => {
     return users.find(user => user.id === id)
   }
 
+  const blogById = (id) => {
+    return props.blogs.find(blog => blog.id === id)
+  }
+
+  console.log('blogById: ', blogById('5c745f0cde9fe11f2e87046b'))
+
   const padding = { padding: 5 };
 
   return (
@@ -248,6 +257,7 @@ const App = (props) => {
         users={users}
         setUser={setUsers}
         userById={userById}
+        blogById={blogById}
       />
 
       

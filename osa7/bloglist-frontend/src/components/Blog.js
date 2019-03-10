@@ -1,43 +1,31 @@
-import React, { useState } from 'react'
+import React from 'react'
 
-const Blog = ({ blog, likeBlog }) => {
-  const [visible, setVisible] = useState(false)
-
-  //const hideWhenVisible = { display: visible ? 'none' : '' }
-  const showWhenVisible = { display: visible ? '' : 'none' }
-
-  const toggleVisibility = () => {
-    setVisible(!visible)
-  }
-
-  const blogStyle = {
-    paddingTop: 10,
-    paddingLeft: 2,
-    border: 'solid',
-    borderWidth: 1,
-    marginBottom: 5
+const Blog = (props) => {
+  if (props.blog === undefined) { 
+    return null
   }
 
   let name = ''
 
-  if (blog.user) {
-    name = blog.user.name
+  if (props.blog.user) {
+    name = props.blog.user.name
   }
 
+  const likeBlog = async blog => {
+    props.addLike(blog.id);
+    props.notify(`blog ${blog.title} by ${blog.author} liked!`);
+  };
+
   return (
-    <div style={blogStyle}>
-      <div onClick={toggleVisibility} className='blog'>
-        {blog.title} {blog.author}
-        <div style={showWhenVisible}>
-          <p>
-            <a href={blog.url}>{blog.url}</a>
+        <div>
+        <h1>{props.blog.title} {props.blog.author}</h1>
+        
+        <a href={props.blog.url}>{props.blog.url}</a>
             <br />
-            {blog.likes} likes <button onClick={() => likeBlog(blog)}>like</button>
+            {props.blog.likes} likes <button onClick={() => likeBlog(props.blog)}>like</button>
             <br />
             added by {name}
-          </p>
-        </div>
-      </div>
+          
     </div>
   )
 }
