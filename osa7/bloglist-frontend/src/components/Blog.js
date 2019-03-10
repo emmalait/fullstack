@@ -1,4 +1,5 @@
 import React from 'react'
+import Notification from '../components/Notification'
 
 const Blog = (props) => {
   if (props.blog === undefined) { 
@@ -18,6 +19,9 @@ const Blog = (props) => {
 
   return (
         <div>
+
+        <Notification message={props.notification} />
+
         <h1>{props.blog.title} {props.blog.author}</h1>
         
         <a href={props.blog.url}>{props.blog.url}</a>

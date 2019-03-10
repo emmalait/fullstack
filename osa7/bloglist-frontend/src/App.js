@@ -25,16 +25,31 @@ const Menu = (props) => {
     paddingRight: 5
   }
 
+  const grey = {
+    backgroundColor: '#C0C0C0',
+    padding: 10
+  }
+
   return (
     <Router>
         <div>
-          <div>
+          <div style={grey}>
             <Link style={padding} to="/">
               home
             </Link>
             <Link style={padding} to="/users">
               users
             </Link>
+          
+            {props.currentUser === null ? (
+              ''
+            ) : (
+              <>
+                {props.currentUser.name} logged in
+                <button onClick={props.handleLogout}>logout</button>
+              </>
+            )}
+
           </div>
           <Route exact path="/" render={() => 
             <Home
@@ -58,7 +73,7 @@ const Menu = (props) => {
             <User user={props.userById(match.params.id)} />
           } />
           <Route exact path="/blogs/:id" render={({match}) =>
-            <Blog blog={props.blogById(match.params.id)} addLike={props.addLike} notify={props.notify}/>
+            <Blog blog={props.blogById(match.params.id)} addLike={props.addLike} notify={props.notify} notification={props.notification}/>
           } />
         </div>
       </Router>
@@ -235,20 +250,10 @@ const App = (props) => {
 
   return (
     <div class="container">
-      <h1>blogs</h1>
-
-      {props.currentUser === null ? (
-        ''
-      ) : (
-        <div>
-          <p>{props.currentUser.name} logged in</p>
-          <button onClick={handleLogout}>logout</button>
-        </div>
-      )}
-
       <Menu 
         notify={notify}
         currentUser={props.currentUser}
+        handleLogout={props.handleLogout}
         notification={props.notification}
         blogs={props.blogs}
         createBlog={props.createBlog}
