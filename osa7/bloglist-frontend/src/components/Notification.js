@@ -5,10 +5,10 @@ const Notification = (props) => {
     return null
   }
 
-  console.log(props.notifType)
+  console.log(props)
 
   const style = {
-    color: props.notifType === 'error' ? 'red' : 'green',
+    color: props.message.notifType === 'error' ? 'red' : 'green',
     background: 'lightgrey',
     fontSize: 20,
     borderStyle: 'solid',
@@ -17,7 +17,7 @@ const Notification = (props) => {
     marginBottom: 10
   }
 
-  return <div style={style}>{props.message}</div>
+  return <div style={style}>{props.message.message}</div>
 }
 
 export default Notification
