@@ -1,44 +1,42 @@
-import React, { useState } from "react";
-import Select from "react-select";
+import React, { useEffect, useState } from "react";
 import { gql, useQuery } from "@apollo/client";
 import { BOOKS_BY_GENRE } from "../App";
 
-const Books = (props) => {
+export const GET_USER = gql`
+  query {
+    me {
+      username
+      favoriteGenre
+    }
+  }
+`;
+
+const Recommended = (props) => {
   const [genre, setGenre] = useState("");
 
   const filtered = useQuery(BOOKS_BY_GENRE, {
     variables: { genre },
   });
 
-  console.log("filtered", filtered);
+  const user = useQuery(GET_USER);
+
+  useEffect(() => {
+    if (user && !user.loading && user.data.me !== null) {
+      setGenre(user.data.me.favoriteGenre);
+    }
+  }, [user]);
 
   if (!props.show) {
     return null;
   }
 
-  const books = props.books;
-  const allGenres = [];
-  books.map((book) => book.genres.map((genre) => allGenres.push(genre)));
-  const genres = allGenres.filter((v, i, a) => a.indexOf(v) === i);
-
-  const options = genres.map((genre) => ({
-    value: genre,
-    label: genre,
-  }));
-
   return (
     <div>
-      <h2>books</h2>
+      <h2>recommendations</h2>
 
-      {genres && (
-        <>
-          <div>genre</div>
-          <Select
-            options={options}
-            onChange={(selectedOption) => setGenre(selectedOption.value)}
-          />
-        </>
-      )}
+      <p>
+        books in your favorite genre: <b>{genre}</b>
+      </p>
 
       {!filtered.loading && (
         <table>
@@ -66,4 +64,4 @@ const Books = (props) => {
   );
 };
 
-export default Books;
+export default Recommended;
