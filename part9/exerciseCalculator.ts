@@ -52,4 +52,11 @@ const calculateExercises = (dailyValues: number[], target: number): Result => {
   return result;
 };
 
-console.log(calculateExercises([3, 0, 2, 4.5, 0, 3, 1], 2));
+const target: number = Number(process.argv[2]);
+const dailyValues: number[] = [];
+
+for (var i = 3; i < process.argv.length; i++) {
+  dailyValues.push(Number(process.argv[i]));
+}
+
+console.log(calculateExercises(dailyValues, target));
