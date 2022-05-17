@@ -191,8 +191,7 @@ const resolvers = {
 
       let foundAuthor = await Author.findOne({ name: args.author });
       if (foundAuthor === null) {
-        const new_author = new Author({ name: args.author, born: null });
-        let foundAuthor;
+        const new_author = new Author({ name: args.author, born: undefined });
         try {
           foundAuthor = await new_author.save();
         } catch (error) {
