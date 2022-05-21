@@ -3,7 +3,7 @@ interface Result {
   trainingDays: number;
   success: boolean;
   rating: Rating;
-  ratingDescription: String;
+  ratingDescription: string;
   target: number;
   average: number;
 }
@@ -21,7 +21,7 @@ const getRating = (average: number, target: number): Rating => {
   }
 };
 
-const getRatingDesc = (rating: Rating): String => {
+const getRatingDesc = (rating: Rating): string => {
   switch (rating) {
     case 1:
       return "aw, you can do better next week!";
@@ -32,7 +32,10 @@ const getRatingDesc = (rating: Rating): String => {
   }
 };
 
-const calculateExercises = (dailyValues: number[], target: number): Result => {
+export const calculateExercises = (
+  dailyValues: number[],
+  target: number
+): Result => {
   const periodLength: number = dailyValues.length;
   const trainingDays: number = dailyValues.filter((e) => e != 0).length;
   const sum: number = dailyValues.reduce((sum, v) => sum + v, 0);
@@ -51,12 +54,3 @@ const calculateExercises = (dailyValues: number[], target: number): Result => {
 
   return result;
 };
-
-const target: number = Number(process.argv[2]);
-const dailyValues: number[] = [];
-
-for (var i = 3; i < process.argv.length; i++) {
-  dailyValues.push(Number(process.argv[i]));
-}
-
-console.log(calculateExercises(dailyValues, target));
