@@ -1,4 +1,5 @@
 import { CoursePart } from "./App";
+import Part from "./Part";
 
 interface ContentProps {
   courseParts: CoursePart[];
@@ -7,19 +8,11 @@ interface ContentProps {
 const Content = (props: ContentProps) => {
   const { courseParts } = props;
 
-  return (
-    <div>
-      <p>
-        {courseParts[0].name} {courseParts[0].exerciseCount}
-      </p>
-      <p>
-        {courseParts[1].name} {courseParts[1].exerciseCount}
-      </p>
-      <p>
-        {courseParts[2].name} {courseParts[2].exerciseCount}
-      </p>
-    </div>
-  );
+  const parts = courseParts.map((part, i) => {
+    return <Part key={i} coursePart={part} />;
+  });
+
+  return <div>{parts}</div>;
 };
 
 export default Content;
