@@ -4,17 +4,14 @@ import { toNewPatient } from "../utils/patientUtils";
 
 const router = express.Router();
 
+router.get("/:id", (req, res) => {
+  const id = req.params.id;
+  res.send(patientService.getPatient(id));
+});
+
 router.get("/", (_req, res) => {
   res.send(patientService.getPatientsWithoutSensitiveData());
 });
-
-/*
-name: string;
-  dateOfBirth: string;
-  ssn: string;
-  gender: string;
-  occupation: string;
-*/
 
 router.post("/", (req, res) => {
   try {

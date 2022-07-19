@@ -6,6 +6,7 @@ type Fields = {
   ssn: unknown;
   gender: unknown;
   occupation: unknown;
+  entries?: unknown;
 };
 
 export const toNewPatient = ({
@@ -14,6 +15,7 @@ export const toNewPatient = ({
   ssn,
   gender,
   occupation,
+  entries,
 }: Fields): NewPatient => {
   const newPatient: NewPatient = {
     name: parseString(name, "name"),
@@ -21,6 +23,7 @@ export const toNewPatient = ({
     ssn: parseString(ssn, "ssn"),
     gender: parseGender(gender),
     occupation: parseString(occupation, "occupation"),
+    entries: entries ? parseEntries(entries) : [],
   };
 
   return newPatient;
@@ -59,4 +62,8 @@ const parseGender = (gender: unknown): Gender => {
     throw new Error("Incorrect or missing gender: " + gender);
   }
   return gender;
+};
+
+const parseEntries = (_entries: unknown): [] => {
+  return [];
 };
