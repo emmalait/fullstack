@@ -4,11 +4,15 @@ import axios from "axios";
 import { useParams } from "react-router-dom";
 import { apiBaseUrl } from "../constants";
 import { useStateValue } from "../state";
-import { Diagnosis, Patient } from "../types";
+import { Gender, Patient } from "../types";
 import { setPatient } from "../state/actions";
 
+import MaleIcon from "@mui/icons-material/Male";
+import FemaleIcon from "@mui/icons-material/Female";
+import EntryDetails from "./EntryDetails";
+
 const PatientPage = () => {
-  const [{ patient, diagnoses }, dispatch] = useStateValue();
+  const [{ patient }, dispatch] = useStateValue();
 
   const { id } = useParams<{ id: string }>();
 
@@ -30,47 +34,24 @@ const PatientPage = () => {
     }
   }, [dispatch, id]);
 
-  const getDiagnosis = (diagnoses: Diagnosis[], code: string) => {
-    const diagnosis = diagnoses.find((diagnosis) => diagnosis.code === code);
-    return diagnosis ? (
-      <span>
-        {diagnosis.code}: {diagnosis?.name}
-      </span>
-    ) : null;
-  };
-
   return (
     <div>
-      <h1>{patient?.name}</h1>
+      <h1>
+        {patient?.name} {patient?.gender === Gender.Male && <MaleIcon />}
+        {patient?.gender === Gender.Female && <FemaleIcon />}
+      </h1>
       <p>
         ssn: {patient?.ssn}
-        <br />
-        gender: {patient?.gender}
         <br />
         occupation: {patient?.occupation}
       </p>
       {patient?.entries && patient.entries.length > 0 && (
-        <>
+        <div>
           <h2>entries</h2>
-          {patient?.entries.map((entry) => {
-            return (
-              <div key={entry.id}>
-                <span>
-                  {entry.date}: <i>{entry.description}</i>
-                </span>
-                {entry.diagnosisCodes && entry.diagnosisCodes.length > 0 && (
-                  <ul>
-                    {entry.diagnosisCodes.map((diagnosisCode, index) => (
-                      <li key={index}>
-                        {getDiagnosis(diagnoses, diagnosisCode)}
-                      </li>
-                    ))}
-                  </ul>
-                )}
-              </div>
-            );
-          })}
-        </>
+          {patient?.entries.map((entry) => (
+            <EntryDetails key={entry.id} entry={entry} />
+          ))}
+        </div>
       )}
     </div>
   );
