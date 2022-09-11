@@ -4,11 +4,11 @@ import axios from "axios";
 import { useParams } from "react-router-dom";
 import { apiBaseUrl } from "../constants";
 import { useStateValue } from "../state";
-import { Patient } from "../types";
+import { Diagnosis, Patient } from "../types";
 import { setPatient } from "../state/actions";
 
 const PatientPage = () => {
-  const [{ patient }, dispatch] = useStateValue();
+  const [{ patient, diagnoses }, dispatch] = useStateValue();
 
   const { id } = useParams<{ id: string }>();
 
@@ -30,6 +30,15 @@ const PatientPage = () => {
     }
   }, [dispatch, id]);
 
+  const getDiagnosis = (diagnoses: Diagnosis[], code: string) => {
+    const diagnosis = diagnoses.find((diagnosis) => diagnosis.code === code);
+    return diagnosis ? (
+      <span>
+        {diagnosis.code}: {diagnosis?.name}
+      </span>
+    ) : null;
+  };
+
   return (
     <div>
       <h1>{patient?.name}</h1>
@@ -45,16 +54,20 @@ const PatientPage = () => {
           <h2>entries</h2>
           {patient?.entries.map((entry) => {
             return (
-              <p key={entry.id}>
-                {entry.date}: <i>{entry.description}</i>
-                {entry.diagnosisCodes && (
+              <div key={entry.id}>
+                <span>
+                  {entry.date}: <i>{entry.description}</i>
+                </span>
+                {entry.diagnosisCodes && entry.diagnosisCodes.length > 0 && (
                   <ul>
                     {entry.diagnosisCodes.map((diagnosisCode, index) => (
-                      <li key={index}>{diagnosisCode}</li>
+                      <li key={index}>
+                        {getDiagnosis(diagnoses, diagnosisCode)}
+                      </li>
                     ))}
                   </ul>
                 )}
-              </p>
+              </div>
             );
           })}
         </>
