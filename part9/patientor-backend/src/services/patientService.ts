@@ -1,5 +1,5 @@
 import patientData from "../../data/patients";
-import { Patient, PublicPatient, NewPatient } from "../types";
+import { Patient, PublicPatient, NewPatient, NewEntry, Entry } from "../types";
 import { v1 as uuid } from "uuid";
 
 const patients: Array<Patient> = patientData;
@@ -24,10 +24,8 @@ const getPatient = (id: string): Patient | null => {
 };
 
 const addPatient = (patient: NewPatient): Patient => {
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-assignment
   const id = uuid();
   const newPatient = {
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
     id,
     ...patient,
   };
@@ -35,9 +33,21 @@ const addPatient = (patient: NewPatient): Patient => {
   return newPatient;
 };
 
+const addEntry = (patientId: string, entry: NewEntry): Entry => {
+  const id = uuid();
+  const newEntry = {
+    id,
+    ...entry,
+  };
+  // Find correct patient and push to that patient's entries
+  patients.find((patient) => patient.id === patientId)?.entries.push(newEntry);
+  return newEntry;
+};
+
 export default {
   getPatients,
   getPatientsWithoutSensitiveData,
   getPatient,
   addPatient,
+  addEntry,
 };

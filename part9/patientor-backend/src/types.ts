@@ -1,10 +1,4 @@
-export interface Diagnosis {
-  code: string;
-  name: string;
-  latin?: string;
-}
-
-interface BaseEntry {
+export interface BaseEntry {
   id: string;
   description: string;
   date: string;
@@ -12,25 +6,42 @@ interface BaseEntry {
   diagnosisCodes?: Array<Diagnosis["code"]>;
 }
 
+export interface Diagnosis {
+  code: string;
+  name: string;
+  latin?: string;
+}
+
+export enum EntryType {
+  OccupationalHealthcare = "OccupationalHealthcare",
+  Hospital = "Hospital",
+  HealthCheck = "HealthCheck",
+}
+
+export interface OccupationalHealthcareEntry extends BaseEntry {
+  type: EntryType.OccupationalHealthcare;
+  employerName: string;
+  sickLeave?: SickLeave;
+}
+
 interface SickLeave {
   startDate: string;
   endDate: string;
 }
 
-interface OccupationalHealthcareEntry extends BaseEntry {
-  type: "OccupationalHealthcare";
-  employerName: string;
-  sickLeave?: SickLeave;
+export interface HospitalEntry extends BaseEntry {
+  type: EntryType.Hospital;
+  discharge: Discharge;
 }
 
-interface Discharge {
+export interface Discharge {
   date: string;
   criteria: string;
 }
 
-interface HospitalEntry extends BaseEntry {
-  type: "Hospital";
-  discharge: Discharge;
+export interface HealthCheckEntry extends BaseEntry {
+  type: EntryType.HealthCheck;
+  healthCheckRating: HealthCheckRating;
 }
 
 export enum HealthCheckRating {
@@ -38,11 +49,6 @@ export enum HealthCheckRating {
   "LowRisk" = 1,
   "HighRisk" = 2,
   "CriticalRisk" = 3,
-}
-
-interface HealthCheckEntry extends BaseEntry {
-  type: "HealthCheck";
-  healthCheckRating: HealthCheckRating;
 }
 
 export type Entry =
@@ -55,17 +61,29 @@ export interface Patient {
   name: string;
   dateOfBirth: string;
   ssn: string;
-  gender: string;
+  gender: Gender;
   occupation: string;
   entries: Entry[];
 }
-
-export type NewPatient = Omit<Patient, "id">;
-
-export type PublicPatient = Omit<Patient, "ssn" | "entries">;
 
 export enum Gender {
   Female = "female",
   Male = "male",
   Other = "other",
 }
+
+export type NewPatient = Omit<Patient, "id">;
+
+export type NewEntry =
+  | NewOccupationalHealthcareEntry
+  | NewHospitalEntry
+  | NewHealthCheckEntry;
+
+export type NewOccupationalHealthcareEntry = Omit<
+  OccupationalHealthcareEntry,
+  "id"
+>;
+export type NewHospitalEntry = Omit<HospitalEntry, "id">;
+export type NewHealthCheckEntry = Omit<HealthCheckEntry, "id">;
+
+export type PublicPatient = Omit<Patient, "ssn" | "entries">;
